@@ -30,6 +30,7 @@ class KaryawanController extends Controller
     {
         $karyawan = Karyawan::create([
             'nama'=>$request->nama,
+            'email'=>$request->email,
             'umur'=>$request->umur,
             'alamat'=>$request->alamat,
             'jabatan'=>$request->jabatan,
@@ -64,6 +65,7 @@ class KaryawanController extends Controller
     {
         $karyawan=Karyawan::findOrFail($id);
         $karyawan->nama=$request->nama;
+        $karyawan->email=$request->email;
         $karyawan->umur=$request->umur;
         $karyawan->alamat=$request->alamat;
         $karyawan->jabatan=$request->jabatan;
