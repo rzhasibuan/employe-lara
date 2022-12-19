@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Illuminate\Auth\Events\Validated;
+use Intervention\Image\Facades\Image;
 
 class KaryawanController extends Controller
 {
@@ -22,28 +22,27 @@ class KaryawanController extends Controller
         ]);
     }
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource    in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'image' => 'required|image|max:2048',
-          ]);
+        
         $karyawan = Karyawan::create([
             'nama'=>$request->nama,
             'email'=>$request->email,
             'umur'=>$request->umur,
             'alamat'=>$request->alamat,
             'jabatan'=>$request->jabatan,
-            'foto'=>$request->file('images')
+            'foto'=>$request->file('foto')->store('file/','public')
         ]);
         return response()->json([
             'data'=>$karyawan
         ]);
     }
+    
 
     
 
