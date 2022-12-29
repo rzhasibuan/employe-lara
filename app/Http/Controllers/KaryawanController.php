@@ -67,15 +67,38 @@ class KaryawanController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $karyawan=Karyawan::findOrFail($id);
-        $karyawan->nama=$request->nama;
-        $karyawan->email=$request->email;
-        $karyawan->umur=$request->umur;
-        $karyawan->alamat=$request->alamat;
-        $karyawan->jabatan=$request->jabatan;
-        $karyawan->foto=$request->foto;
-        $karyawan->update();
+       $request->validate([
+        'nama' => 'required',
+        'email' => 'required|email',
+        'umur' => 'required|numeric',
+        'alamat' => 'required',
+        'jabatan' => 'required',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+    ]);
 
+    $karyawan = Karyawan :: findOrFail($id);
+    
+    if($request->hasFile('foto')){
+        $image = $request->file('foto');
+        $name = time().'.'.$image->getClientOriginalExtension();
+        $destinationPath = public_path('/images');
+        $image->move($destinationPath, $name);
+        $karyawan->foto = $name;
+    }
+
+    $data = [
+        "nama"=>$request->nama,
+        "email"=>$request->email,
+        "umur"=>$request->umur,
+        "alamat"=>$request->alamat,
+        "jabatan"=>$request->jabatan
+    ];
+    if($request->hasFile('foto')){
+        $image = file_get_contents($request->foto);
+        $image_base64 = base64_encode($image);
+        $data['foto'] = $image_base64;
+    }
+    $karyawan->update($data);
         return response()->json([
             'data'=>$karyawan
         ]);
