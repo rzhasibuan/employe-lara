@@ -3,12 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Karyawan;
+use App\Services\KaryawanService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Intervention\Image\Facades\Image;
 
 class KaryawanController extends Controller
 {
+    private KaryawanService $karyawanService;
+
+    public function __construct(KaryawanService $karyawanService)
+    {
+        $this->karyawanService=$karyawanService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,11 +23,12 @@ class KaryawanController extends Controller
      */
     public function index()
     {
-        $karyawan = Karyawan::paginate(10);
-        return response()->json([
+        $karyawan = $this->karyawanService->getAllKaryawan();
+        return response()->json([[
             'data'=>$karyawan
-        ]);
+        ]]);
     }
+
     /**
      * Store a newly created resource    in storage.
      *
@@ -29,23 +37,11 @@ class KaryawanController extends Controller
      */
     public function store(Request $request)
     {
-        
-        $karyawan = Karyawan::create([
-            'nama'=>$request->nama,
-            'email'=>$request->email,
-            'umur'=>$request->umur,
-            'alamat'=>$request->alamat,
-            'jabatan'=>$request->jabatan,
-            'foto'=>$request->file('foto')->store('file/','public')
-        ]);
+        $karyawan = $this->karyawanService->store($request->all());
         return response()->json([
             'data'=>$karyawan
         ]);
     }
-    
-
-    
-
     /**
      * Display the specified resource.
      *
@@ -67,42 +63,11 @@ class KaryawanController extends Controller
      */
     public function update(Request $request,$id)
     {
-       $request->validate([
-        'nama' => 'required',
-        'email' => 'required|email',
-        'umur' => 'required|numeric',
-        'alamat' => 'required',
-        'jabatan' => 'required',
-        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    ]);
+        $karyawan = $this->karyawanService->update($request,$id);
 
-    $karyawan = Karyawan :: findOrFail($id);
-    
-    if($request->hasFile('foto')){
-        $image = $request->file('foto');
-        $name = time().'.'.$image->getClientOriginalExtension();
-        $destinationPath = public_path('/images');
-        $image->move($destinationPath, $name);
-        $karyawan->foto = $name;
-    }
-
-    $data = [
-        "nama"=>$request->nama,
-        "email"=>$request->email,
-        "umur"=>$request->umur,
-        "alamat"=>$request->alamat,
-        "jabatan"=>$request->jabatan
-    ];
-    if($request->hasFile('foto')){
-        $image = file_get_contents($request->foto);
-        $image_base64 = base64_encode($image);
-        $data['foto'] = $image_base64;
-    }
-    $karyawan->update($data);
         return response()->json([
             'data'=>$karyawan
         ]);
-
     }
 
     /**
