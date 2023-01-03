@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class KaryawanService
 {
+
+    
     public function getAllKaryawan()
     {
         $karyawan = Karyawan ::paginate(10);

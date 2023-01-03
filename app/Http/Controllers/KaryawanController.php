@@ -10,6 +10,12 @@ use Intervention\Image\Facades\Image;
 
 class KaryawanController extends Controller
 {
+    private KaryawanService $karyawanService;
+
+    public function __construct(KaryawanService $karyawanService)
+    {
+        $this->karyawanService=$karyawanService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,9 +23,7 @@ class KaryawanController extends Controller
      */
     public function index()
     {
-        $karyawanService = new KaryawanService();
-        $karyawan = $karyawanService->getAllKaryawan();
-
+        $karyawan = $this->karyawanService->getAllKaryawan();
         return response()->json([[
             'data'=>$karyawan
         ]]);
@@ -33,9 +37,7 @@ class KaryawanController extends Controller
      */
     public function store(Request $request)
     {
-        $karyawanService = new KaryawanService();
-        $karyawan = $karyawanService->store($request->all());
-
+        $karyawan = $this->karyawanService->store($request->all());
         return response()->json([
             'data'=>$karyawan
         ]);
@@ -61,8 +63,7 @@ class KaryawanController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $karyawanService = new KaryawanService();
-        $karyawan = $karyawanService->update($request,$id);
+        $karyawan = $this->karyawanService->update($request,$id);
 
         return response()->json([
             'data'=>$karyawan
